@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Préfixes d'objet</title>
+
+  <!-- Bibliotheque Office.js (obligatoire, servie par le CDN Microsoft) -->
+  <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+  <style>
+    :root {
+      --txt: #242424;
+      --txt-soft: #616161;
+      --line: #e0e0e0;
+      --accent: #0f6cbd;
+      --surface: #ffffff;
+      --hover: #f5f5f5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Segoe UI Web", system-ui, sans-serif;
+      color: var(--txt);
+      background: var(--surface);
+      font-size: 14px;
+    }
+    .wrap { padding: 14px 14px 18px; }
+    .head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+    .head h1 { font-size: 15px; font-weight: 600; margin: 0; }
+    .sub { color: var(--txt-soft); font-size: 12px; margin: 0 0 14px; }
+    .btn {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 10px 12px; margin-bottom: 8px;
+      border: 1px solid var(--line); border-radius: 6px;
+      background: var(--surface); cursor: pointer; text-align: left;
+      font-family: inherit; font-size: 14px; color: var(--txt);
+      transition: background .12s, border-color .12s;
+    }
+    .btn:hover { background: var(--hover); border-color: #c7c7c7; }
+    .btn:active { transform: scale(.99); }
+    .btn .name { font-weight: 600; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 5px; font-weight: 600; }
+    .clear {
+      width: 100%; margin-top: 6px; padding: 8px; border: none;
+      background: transparent; color: var(--txt-soft); cursor: pointer;
+      font-family: inherit; font-size: 13px; border-radius: 6px;
+    }
+    .clear:hover { background: var(--hover); color: var(--txt); }
+    .status { margin-top: 12px; font-size: 12px; color: var(--txt-soft); min-height: 16px; }
+    .status.ok { color: #0f6e56; }
+    .status.err { color: #a32d2d; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <h1>Préfixes d'objet</h1>
+    </div>
+    <p class="sub">Choisissez une catégorie. Le préfixe est inséré au début de l'objet du message.</p>
+
+    <div id="buttons"></div>
+
+    <button class="clear" id="clearBtn">Retirer le préfixe</button>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>
