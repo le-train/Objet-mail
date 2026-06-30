@@ -20,32 +20,35 @@ var PREFIXES = [
    A partir d'ici, rien n'a besoin d'etre modifie pour un usage standard.
    ----------------------------------------------------------------------------- */
 
-var mailItem = null;
+var mailItem = null;          // l'element en cours, present uniquement dans Outlook
+var insideOutlook = false;    // true seulement quand la page tourne dans Outlook
 
-Office.onReady(function (info) {
-  if (info.host === Office.HostType.Outlook) {
-    mailItem = Office.context.mailbox.item;
-    buildButtons();
-    document.getElementById("clearBtn").addEventListener("click", removePrefix);
-
-    // Volet epingle : se mettre a jour quand l'utilisateur change de message.
-    Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, function () {
-      mailItem = Office.context.mailbox.item;
-      setStatus("");
-    });
-  }
+// 1) L'interface est construite des le chargement de la page, INDEPENDAMMENT
+//    d'Outlook : ainsi les boutons s'affichent meme en apercu dans un navigateur.
+document.addEventListener("DOMContentLoaded", function () {
+  buildButtons();
+  document.getElementById("clearBtn").addEventListener("click", removePrefix);
 });
 
-// Retire la barre de notification "Pensez a choisir un prefixe" si elle est presente.
-function dismissNudge() {
-  if (mailItem && mailItem.notificationMessages) {
-    mailItem.notificationMessages.removeAsync("prefixNudge", function () {});
-  }
+// 2) Quand la page tourne reellement dans Outlook, on connecte la logique live.
+if (typeof Office !== "undefined" && Office.onReady) {
+  Office.onReady(function (info) {
+    if (info && info.host === Office.HostType.Outlook) {
+      insideOutlook = true;
+      mailItem = Office.context.mailbox.item;
+      // Volet epingle : se mettre a jour quand l'utilisateur change de message.
+      Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, function () {
+        mailItem = Office.context.mailbox.item;
+        setStatus("");
+      });
+    }
+  });
 }
 
 // Construit dynamiquement un bouton par prefixe defini ci-dessus.
 function buildButtons() {
   var container = document.getElementById("buttons");
+  if (!container || container.childElementCount > 0) { return; }
   PREFIXES.forEach(function (p) {
     var btn = document.createElement("button");
     btn.className = "btn";
@@ -69,24 +72,23 @@ function buildButtons() {
   });
 }
 
-// Construit une expression reguliere qui reconnait n'importe lequel de nos prefixes
-// en debut d'objet (pour eviter d'empiler [URGENT] [URGENT] ...).
+// Construit une expression reguliere reconnaissant nos prefixes en debut d'objet.
 function buildPrefixRegex() {
   var escaped = PREFIXES.map(function (p) {
     return p.tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   });
-  // ex : ^\s*(\[URGENT\]|\[RH\])\s*
   return new RegExp("^\\s*(" + escaped.join("|") + ")\\s*", "i");
 }
 
-// Retire un eventuel prefixe gere deja present, sans toucher au reste de l'objet.
 function stripManagedPrefix(subject) {
   return (subject || "").replace(buildPrefixRegex(), "").replace(/^\s+/, "");
 }
 
 // Insere (ou remplace) le prefixe choisi au debut de l'objet.
 function applyPrefix(tag) {
-  if (!mailItem) { return; }
+  if (!insideOutlook || !mailItem) {
+    return setStatus("Aperçu : ouvrez le complément dans Outlook pour modifier l'objet (" + tag + ").");
+  }
   mailItem.subject.getAsync(function (res) {
     if (res.status !== Office.AsyncResultStatus.Succeeded) {
       return setStatus("Impossible de lire l'objet.", "err");
@@ -108,7 +110,9 @@ function applyPrefix(tag) {
 
 // Retire le prefixe gere de l'objet courant.
 function removePrefix() {
-  if (!mailItem) { return; }
+  if (!insideOutlook || !mailItem) {
+    return setStatus("Aperçu : ouvrez le complément dans Outlook pour modifier l'objet.");
+  }
   mailItem.subject.getAsync(function (res) {
     if (res.status !== Office.AsyncResultStatus.Succeeded) {
       return setStatus("Impossible de lire l'objet.", "err");
@@ -124,8 +128,16 @@ function removePrefix() {
   });
 }
 
+// Retire la barre de notification "Pensez a choisir un prefixe" si presente.
+function dismissNudge() {
+  if (mailItem && mailItem.notificationMessages) {
+    mailItem.notificationMessages.removeAsync("prefixNudge", function () {});
+  }
+}
+
 function setStatus(msg, kind) {
   var el = document.getElementById("status");
-  el.textContent = msg;
+  if (!el) { return; }
+  el.textContent = msg || "";
   el.className = "status" + (kind ? " " + kind : "");
 }
