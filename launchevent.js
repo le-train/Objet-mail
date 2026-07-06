@@ -1,28 +1,35 @@
 /* =============================================================================
-   Complement Outlook - Prefixes d'objet : activation evenementielle
+   Complement Outlook - Prefixes d'objet (v2) : activation evenementielle
    -----------------------------------------------------------------------------
-   Ce code s'execute AUTOMATIQUEMENT a l'ouverture d'un nouveau message, sans clic.
-   Comme Outlook ne permet pas d'ouvrir de force le volet interactif, on affiche
-   une barre de notification avec un bouton qui ouvre le volet en un clic.
+   S'execute AUTOMATIQUEMENT a l'ouverture d'un nouveau message OU d'une nouvelle
+   reunion, et affiche un bandeau de rappel avec un bouton qui ouvre le volet.
 
-   OPTION : pour appliquer aussi un prefixe par defaut automatiquement (que
-   l'utilisateur pourra changer ensuite), mettez DEFAULT_PREFIX a la valeur voulue,
-   par ex. "[INTERNE]". Laissez la chaine vide pour ne rien imposer.
+   OPTION : pour appliquer aussi un prefixe par defaut automatiquement, renseignez
+   DEFAULT_PREFIX (ex. "[SLO]"). Laissez vide pour ne rien imposer.
    ============================================================================= */
-var DEFAULT_PREFIX = ""; // ex. "[INTERNE]" ; "" = aucun prefixe applique d'office
+var DEFAULT_PREFIX = ""; // ex. "[SLO]" ; "" = aucun prefixe applique d'office
 
-// Declenche a chaque nouveau message en composition.
+// --- Message : declenche a chaque nouveau mail en composition ---
 function onNewMessageComposeHandler(event) {
+  runNudge("msgOpenPane", event);
+}
+
+// --- Reunion : declenche a chaque nouvelle reunion/rendez-vous en composition ---
+function onNewAppointmentOrganizerHandler(event) {
+  runNudge("apptOpenPane", event);
+}
+
+// Logique commune : prefixe par defaut eventuel, puis bandeau de rappel.
+function runNudge(commandId, event) {
   applyDefaultPrefixIfNeeded(function () {
-    showPrefixNudge(function () {
-      // Toujours signaler la fin du traitement, sinon Outlook bloque le runtime.
-      event.completed();
+    showPrefixNudge(commandId, function () {
+      event.completed(); // toujours signaler la fin, sinon Outlook bloque le runtime
     });
   });
 }
 
-// Affiche la barre d'information avec un bouton "Choisir un prefixe".
-function showPrefixNudge(done) {
+// Affiche le bandeau d'information avec un bouton "Choisir un prefixe".
+function showPrefixNudge(commandId, done) {
   var details = {
     type: Office.MailboxEnums.ItemNotificationMessageType.InsightMessage,
     message: "Pensez à choisir un préfixe d'objet normalisé.",
@@ -31,7 +38,7 @@ function showPrefixNudge(done) {
       {
         actionText: "Choisir un préfixe",
         actionType: Office.MailboxEnums.ActionType.ShowTaskPane,
-        commandId: "openPrefixPane",
+        commandId: commandId,
         contextData: JSON.stringify({ source: "launchevent" })
       }
     ]
@@ -55,8 +62,8 @@ function applyDefaultPrefixIfNeeded(done) {
   });
 }
 
-// Relie le nom declare dans le manifeste a la fonction ci-dessus.
-// (Office.onReady n'est PAS execute dans le runtime d'evenement : on associe directement.)
+// Relie les noms declares dans le manifeste aux fonctions ci-dessus.
 if (typeof Office !== "undefined" && Office.actions && Office.actions.associate) {
   Office.actions.associate("onNewMessageComposeHandler", onNewMessageComposeHandler);
+  Office.actions.associate("onNewAppointmentOrganizerHandler", onNewAppointmentOrganizerHandler);
 }
