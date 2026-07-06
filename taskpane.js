@@ -9,11 +9,19 @@
    Ajoutez ou retirez des entrees librement. Aucune autre modification requise.
    ============================================================================= */
 var PREFIXES = [
-  { label: "Projet X",   tag: "[PROJET-X]",   color: "#185FA5", bg: "#E6F1FB" },
-  { label: "Urgent",     tag: "[URGENT]",     color: "#A32D2D", bg: "#FCEBEB" },
-  { label: "RH",         tag: "[RH]",         color: "#534AB7", bg: "#EEEDFE" },
-  { label: "Commercial", tag: "[COMMERCIAL]", color: "#0F6E56", bg: "#E1F5EE" },
-  { label: "Interne",    tag: "[INTERNE]",    color: "#5F5E5A", bg: "#F1EFE8" }
+  { label: "SLO",         tag: "[SLO]",         color: "#185FA5", bg: "#E6F1FB" },
+  { label: "TALGO",       tag: "[TALGO]",       color: "#0F6E56", bg: "#E1F5EE" },
+  { label: "TET Lot B",   tag: "[TET Lot B]",   color: "#534AB7", bg: "#EEEDFE" },
+  { label: "TET Lot C",   tag: "[TET Lot C]",   color: "#6D3B9E", bg: "#F1E9FB" },
+  { label: "SNCF G&C",    tag: "[SNCF G&C]",    color: "#A32D2D", bg: "#FCEBEB" },
+  { label: "SNCF Réseau", tag: "[SNCF Réseau]", color: "#8A2846", bg: "#FBE9EF" },
+  { label: "TBS",         tag: "[TBS]",         color: "#9A5B10", bg: "#FBF0DF" },
+  { label: "TUDIGO",      tag: "[TUDIGO]",      color: "#2E7D32", bg: "#E6F4E7" },
+  { label: "TER SGV",     tag: "[TER SGV]",     color: "#1B6E7A", bg: "#E2F3F5" },
+  { label: "TER OCC",     tag: "[TER OCC]",     color: "#2A5CA8", bg: "#E7EFFA" },
+  { label: "TER BFC",     tag: "[TER BFC]",     color: "#3A57B5", bg: "#E9ECFB" },
+  { label: "Lot PARISGV", tag: "[Lot PARISGV]", color: "#A62B78", bg: "#FBE9F3" },
+  { label: "CVL",         tag: "[CVL]",         color: "#5F5E5A", bg: "#F1EFE8" }
 ];
 
 /* -----------------------------------------------------------------------------
