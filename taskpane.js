@@ -9,6 +9,7 @@
    Ajoutez ou retirez des entrees librement. Aucune autre modification requise.
    ============================================================================= */
 var PREFIXES = [
+  { label: "Appel d'offres", tag: "[Appel d'offres]", color: "#B4531A", bg: "#FBEADF" },
   { label: "SLO",         tag: "[SLO]",         color: "#185FA5", bg: "#E6F1FB" },
   { label: "TALGO",       tag: "[TALGO]",       color: "#0F6E56", bg: "#E1F5EE" },
   { label: "TET Lot B",   tag: "[TET Lot B]",   color: "#534AB7", bg: "#EEEDFE" },
